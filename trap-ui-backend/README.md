@@ -36,7 +36,7 @@ npm test
 ```
 
 ## API Docs
-See `/Volumes/Vivek's SSD/Mini/trap-ui-backend/docs/API.md`.
+See [docs/API.md](docs/API.md).
 
 ## Schema Script
-See `/Volumes/Vivek's SSD/Mini/trap-ui-backend/db/schema.sql`.
+See [db/schema.sql](db/schema.sql).
