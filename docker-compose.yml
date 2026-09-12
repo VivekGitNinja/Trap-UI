@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: trap_ui
+    ports:
+      - "5432:5432"
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  analytics:
+    build: ./trap-ui-analytics
+    restart: always
+    shm_size: '2gb'
+    environment:
+      PUBLIC_BASE_URL: http://localhost:8000
+    ports:
+      - "8000:8000"
+
+  backend:
+    build: ./trap-ui-backend
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+      JWT_SECRET: change-me
+      POSTGRES_URL: postgresql://postgres:postgres@postgres:5432/trap_ui
+      MONGODB_URL: mongodb://mongo:27017
+      MONGODB_DB: trap_ui
+      REDIS_URL: redis://redis:6379
+      ANALYTICS_SERVICE_URL: http://analytics:8000
+    depends_on:
+      - postgres
+      - mongo
+      - redis
+      - analytics
+
+  frontend:
+    build:
+      context: ./trap-ui-frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_BACKEND_URL: http://localhost:4000
+    environment:
+      NEXT_PUBLIC_BACKEND_URL: http://localhost:4000
+      INTERNAL_BACKEND_URL: http://backend:4000
+    ports:
+      - "3005:3000"
+    depends_on:
+      - backend

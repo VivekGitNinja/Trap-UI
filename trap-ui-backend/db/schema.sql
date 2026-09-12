@@ -1,0 +1,39 @@
+CREATE TABLE IF NOT EXISTS Plans (
+  id SERIAL PRIMARY KEY,
+  name TEXT UNIQUE NOT NULL,
+  scan_limit INTEGER NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS Users (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'user',
+  plan TEXT NOT NULL DEFAULT 'free',
+  scans_remaining INTEGER NOT NULL DEFAULT 5,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS Reports (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES Users(id),
+  website_url TEXT NOT NULL,
+  trap_ui_score NUMERIC NOT NULL,
+  breakdown_json JSONB NOT NULL,
+  industry_tag TEXT,
+  pdf_path TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS ScanJobs (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES Users(id),
+  url TEXT NOT NULL,
+  status TEXT NOT NULL,
+  result_json JSONB,
+  error_message TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
